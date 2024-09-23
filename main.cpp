@@ -72,18 +72,14 @@ int main(int argc, char* argv[])
     processMgmt.readProcessFile(file);
 
 
+	cout << "I made it here!\n";
     time = 0;
 //    processorAvailable = true;
 
     // keep running the loop until all processes have been added and have run to completion
     // --> Running as long as there are still running processes
-    while(processMgmt.moreProcessesComing() && !processList.empty())
+    while(processMgmt.moreProcessesComing() || !processList.empty())
     {
-        //update the list of ready processes is
-        
-        // update what the currentProc is 
-        Process currentProc = processList.front();
-      
         //Update our current time step
         ++time;
 
@@ -108,34 +104,37 @@ int main(int argc, char* argv[])
         //TODO add in the code to take an appropriate action for this time step!
         //you should set the action variable based on what you do this time step. you can just copy and paste the lines below and uncomment them, if you want.
        
+
+	cout << "I made it here!\n";
+
        // if there is a running process
-        if(currentProc.state == processing){
+        if(processList.front().state == processing){
 
             // update total time given to this process
-            currentProc.processorTime++;
+            processList.front().processorTime++;
           
             // if the total time given to this processor matches the time at which the processors' first ioEvent occurs,
             // add the ioEvent to the pending list of all IOInterrupts
-            if(currentProc.processorTime - currentProc.ioEvents.front().time == 0){
-                ioModule.submitIORequest(time, currentProc.ioEvents.front(), currentProc);
-                currentProc.state = blocked;
+            if(processList.front().processorTime - processList.front().ioEvents.front().time == 0){
+                ioModule.submitIORequest(time, processList.front().ioEvents.front(), processList.front());
+                processList.front().state = blocked;
                 stepAction = ioRequest;
-                break;
             }
             // or if the process has run long enough to complete, mark it as so
-            else if(currentProc.processorTime == currentProc.reqProcessorTime){
-                currentProc.state = done;
+            else if(processList.front().processorTime == processList.front().reqProcessorTime){
+                processList.front().state = done;
                 stepAction = complete;
             }
             else{ 
                 stepAction = continueRun;
-                break; 
             }
         }
         // OR, if there is a newly added process with the state newArrival,
         // admit it by setting its state to ready
         else if (processList.back().state == newArrival){
-            processList.back().state = ready;
+	    int i=0;
+            while(processList[i].state == ready) { i++; }
+            processList[i].state = ready;
             stepAction = admitNewProc;
         }
         // OR, if there is an interrupt that has completed: 

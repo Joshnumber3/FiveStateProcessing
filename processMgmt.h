@@ -33,7 +33,7 @@ class ProcessManagement
     private:
       vector<Process> m_pending;
 
-      list<Process>& m_procList;
+      vector<Process>& m_procList;
 };
 
 #endif
